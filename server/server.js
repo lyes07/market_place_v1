@@ -40,7 +40,7 @@ server.use(
 
 
 
-server.get('/',async (req,res)=>{
+server.get('/api/',async (req,res)=>{
     try {
         const query = await db.query('SELECT p.id,p.name, p.price, p.image_link as image, u.name as saller FROM products as p , users as u WHERE p.saller_id = u.id;')
         res.status(200).json({
@@ -55,7 +55,7 @@ server.get('/',async (req,res)=>{
     }
 })
 
-server.get('/:userId',async (req,res)=>{
+server.get('/api/:userId',async (req,res)=>{
     try {
         const userId = req.params.userId
         const query = await db.query('SELECT id, name, price, image_link as image FROM products WHERE saller_id = $1;',[userId])
@@ -72,7 +72,7 @@ server.get('/:userId',async (req,res)=>{
 })
 
 
-server.delete('/:id',async(req,res)=>{
+server.delete('/api/:id',async(req,res)=>{
     try {
         const deleteProduct = await db.query('DELETE FROM products WHERE id = $1;',[req.params.id])
         res.status(204).json("product is deleted")
@@ -81,7 +81,7 @@ server.delete('/:id',async(req,res)=>{
     }
 })
 
-server.post('/addProduct', async (req, res) => {
+server.post('/api/addProduct', async (req, res) => {
     const { name, price, image , saller } = req.body
     try {
         const query = await db.query(
@@ -107,7 +107,7 @@ server.post('/addProduct', async (req, res) => {
 
 
 
-server.post('/signup', async (req, res) => {
+server.post('/api/signup', async (req, res) => {
     const { name, email, password } = req.body
 
     if (
@@ -147,7 +147,7 @@ server.post('/signup', async (req, res) => {
 })
 
 
-server.post('/login', async (req, res) => {
+server.post('/api/login', async (req, res) => {
     const { email, password } = req.body
 
     if (email == null || password == null) {
@@ -188,7 +188,7 @@ server.post('/login', async (req, res) => {
     }
 })
 
-server.post('/logout', async (req, res) => {
+server.post('/api/logout', async (req, res) => {
     try {
         await req.session.destroy()
         res.clearCookie('connect.sid', {path: '/'})
@@ -200,7 +200,7 @@ server.post('/logout', async (req, res) => {
 })
 
 
-server.put('/:id', async(req,res)=>{
+server.put('/api/:id', async(req,res)=>{
     try {
         const {name, price, image} = req.body
         const response = await db.query('UPDATE products SET name = $1, price = $2, image_link = $3 WHERE id = $4 RETURNING *;',[name, price, image, req.params.id])
@@ -211,7 +211,7 @@ server.put('/:id', async(req,res)=>{
 })
 
 
-server.post(`/account/:id`,async(req,res)=>{
+server.post(`/api/account/:id`,async(req,res)=>{
     try {
         console.log('0');
         await db.query('delete from products where saller_id=$1',[req.params.id])
@@ -232,7 +232,7 @@ server.post(`/account/:id`,async(req,res)=>{
 
 
 
-server.post('/fetch-user', async (req, res) => {
+server.post('/api/fetch-user', async (req, res) => {
     if (req.sessionID && req.session.user) {
         res.status(200)
         return res.json({ 
